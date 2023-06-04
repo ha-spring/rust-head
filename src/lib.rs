@@ -10,6 +10,28 @@ pub struct Config {
     bytes: Option<usize>,
 }
 
+fn parse_positive_int(val: &str) -> MyResult<usize> {
+    match val.parse() {
+        Ok(n) if n > 0 => Ok(n),
+        _ => Err(From::from(val)),
+    }
+}
+
+#[test]
+fn test_parse_positive_int() {
+    let res = parse_positive_int("3");
+    assert!(res.is_ok());
+    assert_eq!(res.unwrap(), 3);
+
+    let res = parse_positive_int("foo");
+    assert!(res.is_err());
+    assert_eq!(res.unwrap_err().to_string(), "foo".to_string());
+
+    let res = parse_positive_int("0");
+    assert!(res.is_err());
+    assert_eq!(res.unwrap_err().to_string(), "0".to_string());
+}
+
 pub fn run(config: Config) -> MyResult<()> {
     println!("{:?}", config);
     Ok(())
@@ -44,7 +66,7 @@ pub fn get_args() -> MyResult<Config> {
 
     Ok(Config {
         files: matches.values_of_lossy("files").unwrap(),
-        lines: matches.values_of_lossy("lines"),
-        bytes: matches.values_of_lossy("bytes"),
+        lines: 10,   //matches.values_of_lossy("lines").unwrap()[0] as usize,
+        bytes: None, //matches.values_of_lossy("bytes"),
     })
 }

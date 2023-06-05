@@ -67,9 +67,21 @@ pub fn get_args() -> MyResult<Config> {
         )
         .get_matches();
 
+    let lines = matches
+        .value_of("lines")
+        .map(parse_positive_int)
+        .transpose()
+        .map_err(|e| format!("illegal line count -- {}", e))?;
+
+    let bytes = matches
+        .value_of("bytes")
+        .map(parse_positive_int)
+        .transpose()
+        .map_err(|e| format!("illegal byte count -- {}", e))?;
+
     Ok(Config {
         files: matches.values_of_lossy("files").unwrap(),
-        lines: 10,   //matches.values_of_lossy("lines").unwrap()[0] as usize,
-        bytes: None, //matches.values_of_lossy("bytes"),
+        lines: lines.unwrap(),
+        bytes,
     })
 }

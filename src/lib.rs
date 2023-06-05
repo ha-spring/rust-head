@@ -35,18 +35,22 @@ fn test_parse_positive_int() {
 }
 
 fn open(filename: &str) -> MyResult<Box<dyn BufRead>> {
-  match filename {
-    "-" => Ok(Box::new(BufReader::new(io::stdin()))),
-    _ => Ok(Box::new(BufReader::new(File::open(filename)?))),
-  }
+    match filename {
+        "-" => Ok(Box::new(BufReader::new(io::stdin()))),
+        _ => Ok(Box::new(BufReader::new(File::open(filename)?))),
+    }
 }
 
 pub fn run(config: Config) -> MyResult<()> {
     for filename in config.files {
-      match open(&filename) {
-        Err(e) => eprintln!("{}: {}", filename, e),
-        Ok(_) => println!("Opened {}", filename),
-      }
+        match open(&filename) {
+            Err(e) => eprintln!("{}: {}", filename, e),
+            Ok(file) => {
+                for line in file.lines().take(config.lines) {
+                    println!("{}", line?);
+                }
+            }
+        }
     }
     Ok(())
 }
